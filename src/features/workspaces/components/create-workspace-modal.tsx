@@ -16,41 +16,41 @@ export const CreateWorkspaceModal = () => {
   const router = useRouter();
   const [open, setOpen] = useCreateWorkspaceModel();
   const [name, setName] = useState<string>("");
-  const { mutated, data, error, isError, isPending, isSettled, isSuccess } =
-    useCreateWorkspace();
+  const { mutated, isPending } = useCreateWorkspace();
 
+  // Handle modal close and reset name field
   const handleClose = () => {
+    setName(""); // Reset workspace name
     setOpen(false);
-    setName("");
   };
 
+  // Handle form submit and workspace creation
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     mutated(
       { name },
       {
         onSuccess: (id) => {
           toast.success("Workspace created successfully");
-          router.push(`/workspace/${id}`);
-          handleClose();
+          router.push(`/workspace/${id}`); // Redirect to the new workspace
+          handleClose(); // Close the modal before redirecting
         },
         onError: (error) => {
           console.error(error);
-        },
-        onSettled: () => {
-          console.log("Settled");
+          toast.error("Failed to create workspace");
         },
       }
     );
-    handleClose();
   };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a workspace</DialogTitle>
         </DialogHeader>
-        <form className=" space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <Input
             disabled={isPending}
             value={name}
@@ -60,7 +60,7 @@ export const CreateWorkspaceModal = () => {
             minLength={3}
             placeholder="Workspace name e.g. 'My Team', 'Personal', 'Home'"
           />
-          <div className=" flex justify-end">
+          <div className="flex justify-end">
             <Button disabled={isPending}>Create</Button>
           </div>
         </form>
