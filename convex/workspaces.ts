@@ -1,4 +1,4 @@
-import { ConvexError, v } from "convex/values";
+import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { auth } from "./auth";
 
@@ -20,7 +20,7 @@ export const newJoinCode = mutation({
     const userId = await auth.getUserId(ctx);
 
     if(!userId) {
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     const member = await ctx.db
@@ -31,7 +31,7 @@ export const newJoinCode = mutation({
     .unique();
 
     if(!member || member.role !== "admin"){
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     const joinCode = generateCode();
@@ -44,6 +44,45 @@ export const newJoinCode = mutation({
   },
 });
 
+export const join = mutation({
+  args: {
+    code: v.string(),
+    id: v.id("workspaces"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+
+    if(!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const workspace = await ctx.db.get(args.id);
+
+    if(!workspace || workspace.joinCode !== args.code.toLowerCase()){
+      throw new Error("Invalid code");
+    }
+
+    const existingMember = await ctx.db
+    .query("members")
+    .withIndex("by_workspace_id_and_user_id", (q) =>
+      q.eq("workspaceId", args.id).eq("userId", userId),
+    )
+    .unique();
+
+    if(existingMember){
+      throw new Error("Already a member");
+    }
+
+    await ctx.db.insert("members", {
+      userId,
+      workspaceId: workspace._id,
+      role: "member"
+    });
+
+    return workspace._id;
+  }
+})
+
 export const create = mutation({
   args: {
     name: v.string(),
@@ -52,7 +91,7 @@ export const create = mutation({
     const userId = await auth.getUserId(ctx);
 
     if(!userId) {
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
     const joinCode = generateCode();
 
@@ -107,6 +146,33 @@ export const get = query({
   },
 });
 
+export const getInfoById = query({
+  args: {
+    id: v.id("workspaces"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+
+    if(!userId) {
+      return null
+    }
+
+    const member = await ctx.db
+    .query("members")
+    .withIndex("by_workspace_id_and_user_id", (q) =>
+      q.eq("workspaceId", args.id).eq("userId", userId),
+    )
+    .unique();
+
+    const workspace = await ctx.db.get(args.id);
+
+    return {
+      name: workspace?.name,
+      isMember: !!member,
+    }
+  },
+})
+
 export const getById = query({
   args: {
     id: v.id("workspaces"),
@@ -115,7 +181,7 @@ export const getById = query({
     const userId = await auth.getUserId(ctx);
 
     if(!userId) {
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     const member = await ctx.db
@@ -142,7 +208,7 @@ export const update = mutation({
     const userId = await auth.getUserId(ctx);
 
     if(!userId) {
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     const member = await ctx.db
@@ -153,7 +219,7 @@ export const update = mutation({
     .unique();
 
     if(!member || member.role !== "admin"){
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     await ctx.db.patch(args.id, {
@@ -172,7 +238,7 @@ export const remove = mutation({
     const userId = await auth.getUserId(ctx);
 
     if(!userId) {
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     const member = await ctx.db
@@ -183,7 +249,7 @@ export const remove = mutation({
     .unique();
 
     if(!member || member.role !== "admin"){
-      throw new ConvexError("Unauthorized");
+      throw new Error("Unauthorized");
     }
 
     const [members] = await Promise.all([
