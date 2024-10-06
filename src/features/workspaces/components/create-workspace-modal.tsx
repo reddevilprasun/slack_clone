@@ -18,6 +18,8 @@ export const CreateWorkspaceModal = () => {
   const [name, setName] = useState<string>("");
   const { mutated, isPending } = useCreateWorkspace();
 
+  console.log("Create workspace open: ", open);
+
   // Handle modal close and reset name field
   const handleClose = () => {
     setName(""); // Reset workspace name
@@ -32,12 +34,11 @@ export const CreateWorkspaceModal = () => {
       { name },
       {
         onSuccess: (id) => {
+          handleClose(); // Close the modal before redirecting
           toast.success("Workspace created successfully");
           router.push(`/workspace/${id}`); // Redirect to the new workspace
-          handleClose(); // Close the modal before redirecting
         },
-        onError: (error) => {
-          console.error(error);
+        onError: () => {
           toast.error("Failed to create workspace");
         },
       }

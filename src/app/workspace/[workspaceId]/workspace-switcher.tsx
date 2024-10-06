@@ -24,6 +24,13 @@ export const WorkspaceSwitcher = () => {
 
   const fillerWorkspaces = workspaces?.filter((ws) => ws._id !== workspaceId);
 
+  const handleCreateNewWorkspace = () => {
+    // Delay opening the modal slightly to avoid conflicts
+    setTimeout(() => {
+      setOpen(true);
+    }, 100);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -64,7 +71,7 @@ export const WorkspaceSwitcher = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className=" cursor-pointer capitalize"
-          onClick={() => setOpen(true)}
+          onClick={handleCreateNewWorkspace}
         >
           <div className=" size-9 relative overflow-hidden bg-[#F2F2F2] text-slate-800 font-semibold text-lg rounded-md flex items-center justify-center mr-2">
             <Plus />
