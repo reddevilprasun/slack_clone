@@ -15,9 +15,11 @@ import { WorkspaceSection } from "./workspace-section";
 import { useGetMembers } from "@/features/members/api/use-get-member";
 import { UserItem } from "./user-item";
 import { useCreateChannelModel } from "@/features/channels/store/use-create-channel-model";
+import { useChannelId } from "@/hooks/use-channel-id";
 
 export const WorkspaceSidebar = () => {
   const workspaceId = useWorkspaceId();
+  const channelId = useChannelId();
   const [_channelOpen, setChannelOpen] = useCreateChannelModel();
 
   const { data: workspace, isLoading: workspaceLoading } = useGetWorkspaceById({
@@ -74,6 +76,7 @@ export const WorkspaceSidebar = () => {
             label={item.name}
             icon={HashIcon}
             id={item._id}
+            variant={channelId === item._id ? "active" : "default"}
           />
         ))}
       </WorkspaceSection>
@@ -88,6 +91,7 @@ export const WorkspaceSidebar = () => {
             label={item.user.name!}
             image={item.user.image!}
             id={item._id}
+            isCurrentUser={item._id === member._id}
           />
         ))}
       </WorkspaceSection>

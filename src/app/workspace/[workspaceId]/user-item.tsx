@@ -26,6 +26,7 @@ interface UserItemProps {
   label:string;
   image:string;
   variant?: VariantProps<typeof userItemVariants>["variant"];
+  isCurrentUser?:boolean;
 }
 
 export const UserItem = ({
@@ -33,6 +34,7 @@ export const UserItem = ({
   label= "Member",
   image,
   variant,
+  isCurrentUser,
 }:UserItemProps) => {
   const workspaceId = useWorkspaceId();
   return (
@@ -47,7 +49,7 @@ export const UserItem = ({
           <AvatarImage className=" rounded-md" src={image}/>
           <AvatarFallback className="rounded-md bg-sky-500 text-sm text-white">{label.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
-        <span className=" text-sm truncate">{label}</span>
+        <span className=" text-sm truncate">{label} {isCurrentUser && " (You)"}</span>
       </Link>
     </Button>
   );
