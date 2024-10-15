@@ -85,12 +85,13 @@ export default function Editor({
             enter: {
               key: "Enter",
               handler: () => {
-                //TODO add Submit form
 
                 const text = quill.getText();
                 const addedImage = imageElementRef.current?.files?.[0] || null;
 
-                const isEmpty = !addedImage && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+                const isEmpty =
+                  !addedImage &&
+                  text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
                 if (isEmpty) return;
 
                 const body = JSON.stringify(quill.getContents());
@@ -156,7 +157,8 @@ export default function Editor({
     quill.insertText(quill.getSelection()?.index || 0, emoji.native);
   };
 
-  const isEmptyText = !image && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+  const isEmptyText =
+    !image && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
 
   return (
     <div className=" flex flex-col">
@@ -171,7 +173,12 @@ export default function Editor({
           setImage(file);
         }}
       />
-      <div className=" flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm bg-white">
+      <div
+        className={cn(
+          " flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm bg-white",
+          disabled && "cursor-not-allowed opacity-50"
+        )}
+      >
         <div ref={containerRef} className="h-full ql-custom" />
         {!!image && (
           <div className="p-2">
@@ -247,7 +254,7 @@ export default function Editor({
                   onSubmitted({
                     body: JSON.stringify(quillRef.current?.getContents()),
                     image,
-                  })
+                  });
                 }}
               >
                 Save
@@ -268,7 +275,7 @@ export default function Editor({
                 onSubmitted({
                   body: JSON.stringify(quillRef.current?.getContents()),
                   image,
-                })
+                });
               }}
             >
               <MdSend className=" size-4" />
