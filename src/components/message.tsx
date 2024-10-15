@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useDeleteMessage } from "@/features/messages/api/use-delete-message";
 import { useConfirmModal } from "@/hooks/use-confirm";
+import { useToggleReaction } from "@/features/reactions/api/use-toggle-reactions";
+import { Reactions } from "./reactions";
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false });
 const RenderMessage = dynamic(() => import("@/components/render-message"), {
@@ -69,13 +71,16 @@ export const Message = ({
     useUpdateMessage();
   const { mutated: deleteMessage, isPending: isDeletingMessage } =
     useDeleteMessage();
+  const { mutated: toggleReaction, isPending: isTogglingReaction } =
+    useToggleReaction();
 
   const [confirm, ConfirmModel] = useConfirmModal(
     "Delete message",
     "Are you sure you want to delete this message?"
   );
 
-  const isPending = isUpdatingMessage || isDeletingMessage;
+  const isPending =
+    isUpdatingMessage || isDeletingMessage || isTogglingReaction;
 
   const handleUpdateMessage = ({ body }: { body: string }) => {
     updateMessage(
@@ -106,6 +111,17 @@ export const Message = ({
         },
         onError: () => {
           toast.error("Failed to delete message");
+        },
+      }
+    );
+  };
+
+  const handleToggleReaction = (type: string) => {
+    toggleReaction(
+      { messageId: id, type },
+      {
+        onError: () => {
+          toast.error("Failed to add reaction");
         },
       }
     );
@@ -148,6 +164,7 @@ export const Message = ({
                     (Edited) {formatFullDate(updatedAt)}
                   </span>
                 ) : null}
+                <Reactions data={reactions} onChange={handleToggleReaction} />
               </div>
             )}
           </div>
@@ -158,7 +175,7 @@ export const Message = ({
               handleEdit={() => setEditingId(id)}
               handleDelete={handleDeleteMessage}
               handleThread={() => {}}
-              handleReaction={() => {}}
+              handleReaction={handleToggleReaction}
               hideThreadButton={hideThreadButton}
             />
           )}
@@ -219,6 +236,7 @@ export const Message = ({
                   (Edited) {formatFullDate(updatedAt)}
                 </span>
               ) : null}
+              <Reactions data={reactions} onChange={handleToggleReaction} />
             </div>
           )}
         </div>
@@ -229,7 +247,7 @@ export const Message = ({
             handleEdit={() => setEditingId(id)}
             handleDelete={handleDeleteMessage}
             handleThread={() => {}}
-            handleReaction={() => {}}
+            handleReaction={handleToggleReaction}
             hideThreadButton={hideThreadButton}
           />
         )}

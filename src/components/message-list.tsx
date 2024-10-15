@@ -6,6 +6,7 @@ import { useWorkspaceId } from "@/hooks/use-workspace-id";
 import { ChannelHero } from "./channel-hero";
 import { useState } from "react";
 import { Id } from "../../convex/_generated/dataModel";
+import { Loader } from "lucide-react";
 interface MessageListProps {
   memberName?: string;
   memberImage?: string;
@@ -44,10 +45,9 @@ export const MessageList = ({
   canLoadMore,
 }: MessageListProps) => {
   const workspaceId = useWorkspaceId();
-  const currentMember = useCurrentMember({workspaceId});
+  const currentMember = useCurrentMember({ workspaceId });
 
-  const [editingId, setEditingId] = useState< Id<"messages"> | null>(null);
-
+  const [editingId, setEditingId] = useState<Id<"messages"> | null>(null);
 
   const groupByDateMessages = data?.reduce(
     (acc, message) => {
@@ -94,8 +94,12 @@ export const MessageList = ({
                 id={message._id}
                 memberId={message.memberId}
                 authorImage={message.user.image}
-                authorName={message.user._id === currentMember.data?.userId ? "You" : message.user.name}
-                isAuthor={message.memberId === currentMember.data?._id }
+                authorName={
+                  message.user._id === currentMember.data?.userId
+                    ? "You"
+                    : message.user.name
+                }
+                isAuthor={message.memberId === currentMember.data?._id}
                 reactions={message.reactions}
                 body={message.body}
                 image={message.image}
@@ -113,23 +117,36 @@ export const MessageList = ({
           })}
         </div>
       ))}
-      {variant === "channel" && channelName && channelCreatedAt && (
-        <ChannelHero
-          title={channelName}
-          channelCreatedAt={channelCreatedAt}
-        />
-      )}
-      {/* {canLoadMore && (
-        <div className=" flex justify-center mt-4">
-          <button
-            onClick={loadMore}
-            disabled={isLoadingMore}
-            className=" bg-primary-foreground text-primary-background rounded-full px-4 py-2"
-          >
-            {isLoadingMore ? "Loading..." : "Load more"}
-          </button>
+
+      <div 
+        className="h-1"
+        ref={(el) => {
+          if (!el || !canLoadMore) return;
+          const observer = new IntersectionObserver(
+            ([entries]) => {
+              if (entries.isIntersecting && canLoadMore) {
+                loadMore();
+              }
+            },
+            { threshold: 1.0 }
+          );
+          observer.observe(el);
+          return () => observer.disconnect();
+        }}
+      />
+
+      {isLoadingMore && (
+        <div className=" text-center my-2 relative">
+          <hr className=" absolute top-1/2 left-0 right-0 border-b border-gray-300" />
+          <span className=" relative inline-block bg-white px-4 py-1 rounded-full text-xs border border-gray-300 shadow-sm">
+            <Loader className=" size-4 animate-spin"/>
+          </span>
         </div>
-      )} */}
+      )}
+
+      {variant === "channel" && channelName && channelCreatedAt && (
+        <ChannelHero title={channelName} channelCreatedAt={channelCreatedAt} />
+      )}
     </div>
   );
 };
