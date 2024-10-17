@@ -113,6 +113,7 @@ export const MessageList = ({
                 threadCount={message.threadCount}
                 threadImage={message.threadImage}
                 threadTimestamp={message.threadTimeStamp}
+                threadName={message.threadName}
               />
             ) : null;
           })}
