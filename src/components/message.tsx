@@ -83,7 +83,7 @@ export const Message = ({
     "Are you sure you want to delete this message?"
   );
 
-  const { onClose, onOpenMessage, parentMessageId } = usePanel();
+  const { onClose, onOpenMessage, parentMessageId, onOpenProfile } = usePanel();
 
   const isPending =
     isUpdatingMessage || isDeletingMessage || isTogglingReaction;
@@ -209,7 +209,7 @@ export const Message = ({
         )}
       >
         <div className=" flex items-start gap-2">
-          <button>
+          <button onClick={() => onOpenProfile(memberId)}>
             <Avatar>
               <AvatarImage src={authorImage} />
               <AvatarFallback className=" bg-sky-500 text-white text-sm">
@@ -231,7 +231,7 @@ export const Message = ({
             <div className=" flex flex-col w-full overflow-hidden">
               <div className=" text-sm">
                 <button
-                  onClick={() => {}}
+                  onClick={() => onOpenProfile(memberId)}
                   className=" font-bold text-primary hover:underline"
                 >
                   {authorName}

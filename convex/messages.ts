@@ -33,7 +33,7 @@ const populateThread = async (ctx: QueryCtx, messageId: Id<"messages">) => {
       count: 0,
       image: undefined,
       timeStamp: 0,
-      name: ""
+      name: "",
     };
   }
 
@@ -45,7 +45,7 @@ const populateThread = async (ctx: QueryCtx, messageId: Id<"messages">) => {
       count: messages.length,
       image: undefined,
       timeStamp: 0,
-      name: ""
+      name: "",
     };
   }
 
@@ -73,7 +73,7 @@ const getMember = async (
 };
 
 export const update = mutation({
-  args:{
+  args: {
     messageId: v.id("messages"),
     body: v.string(),
   },
@@ -106,8 +106,8 @@ export const update = mutation({
     });
 
     return args.messageId;
-  }
-})
+  },
+});
 
 export const remove = mutation({
   args: {
@@ -134,6 +134,17 @@ export const remove = mutation({
 
     if (member.userId !== userId) {
       throw new Error("Unauthorized");
+    }
+
+    const [reactions] = await Promise.all([
+      ctx.db
+        .query("reactions")
+        .withIndex("by_message_id", (q) => q.eq("messageId", args.messageId))
+        .collect(),
+    ]);
+
+    for (const reaction of reactions) {
+      await ctx.db.delete(reaction._id);
     }
 
     await ctx.db.delete(args.messageId);

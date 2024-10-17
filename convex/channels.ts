@@ -62,8 +62,8 @@ export const getById = query({
     }
 
     return channel;
-  }
-})
+  },
+});
 
 export const create = mutation({
   args: {
@@ -97,7 +97,7 @@ export const create = mutation({
 
     return data;
   },
-})
+});
 
 export const update = mutation({
   args: {
@@ -135,8 +135,8 @@ export const update = mutation({
     });
 
     return args.id;
-  }
-})
+  },
+});
 
 export const remove = mutation({
   args: {
@@ -166,9 +166,19 @@ export const remove = mutation({
       throw new Error("Unauthorized");
     }
 
+    const [messages] = await Promise.all([
+      ctx.db
+        .query("messages")
+        .withIndex("by_channel_id", (q) => q.eq("channelId", args.id))
+        .collect(),
+    ]);
+
+    for (const message of messages) {
+      await ctx.db.delete(message._id);
+    }
+
     await ctx.db.delete(args.id);
 
     return args.id;
-  }
-})   
-
+  },
+});
