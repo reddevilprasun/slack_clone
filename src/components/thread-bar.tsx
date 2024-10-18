@@ -19,7 +19,6 @@ export const ThreadBar = ({
 }: ThreadBarProps) => {
   if (!count || !timestamp) return null;
 
-  console.log("ThreadBarProps", count, image, timestamp);
 
   return (
     <button

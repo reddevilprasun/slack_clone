@@ -18,7 +18,6 @@ export const CreateWorkspaceModal = () => {
   const [name, setName] = useState<string>("");
   const { mutated, isPending } = useCreateWorkspace();
 
-  console.log("Create workspace open: ", open);
 
   // Handle modal close and reset name field
   const handleClose = () => {

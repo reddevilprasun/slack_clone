@@ -17,7 +17,6 @@ export default function ChannelPage() {
 
   const { results,status, loadMore } = useGetMessages({ channelId })
 
-  console.log(results);
 
   if(channelLoading || status === "LoadingFirstPage") {
     return (
