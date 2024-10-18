@@ -150,11 +150,11 @@ export default function Editor({
     }
   };
 
-  const onEmojiSelect = (emoji: any) => {
+  const onEmojiSelect = (emoji: string) => {
     const quill = quillRef.current;
     if (!quill) return;
 
-    quill.insertText(quill.getSelection()?.index || 0, emoji.native);
+    quill.insertText(quill.getSelection()?.index || 0, emoji);
   };
 
   const isEmptyText =

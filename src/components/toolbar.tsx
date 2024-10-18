@@ -27,7 +27,7 @@ export const Toolbar = ({
       <div className="opacity-0 group-hover:opacity-100 transition-opacity border bg-white rounded-md shadow-sm">
         <EmojiPopover
           hint="React to message"
-          onEmojiSelect={(emoji) => handleReaction(emoji.native)}
+          onEmojiSelect={(emoji) => handleReaction(emoji)}
         >
           <Button variant="ghost" size="iconSm" disabled={isPending}>
             <SmileIcon className=" size-4" />
