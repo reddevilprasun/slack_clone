@@ -22,7 +22,7 @@ export const WorkspaceSidebar = () => {
   const workspaceId = useWorkspaceId();
   const channelId = useChannelId();
   const memberId = useMemberId();
-  const [_channelOpen, setChannelOpen] = useCreateChannelModel();
+  const [, setChannelOpen] = useCreateChannelModel();
 
   const { data: workspace, isLoading: workspaceLoading } = useGetWorkspaceById({
     id: workspaceId,
@@ -32,11 +32,11 @@ export const WorkspaceSidebar = () => {
     workspaceId: workspaceId,
   });
 
-  const { data: channels, isLoading: channelsLoading } = useGetChannels({
+  const { data: channels} = useGetChannels({
     workspaceId: workspaceId,
   });
 
-  const { data: members, isLoading: membersLoading } = useGetMembers({
+  const { data: members} = useGetMembers({
     workspaceId: workspaceId,
   });
 
